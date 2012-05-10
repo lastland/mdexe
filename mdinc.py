@@ -15,11 +15,12 @@ def mdinc(args):
     try:
 	f = open(filename)
 	for line in f:
+	    line = line[:-1]
 	    res = inc_prog.search(line)
 	    if res != None:
 		inc_f = open(res.group(0))
 		for line in inc_f:
-		    print line
+		    print line[:-1]
 	    else:
 		print line
     except IOError:
