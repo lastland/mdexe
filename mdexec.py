@@ -14,7 +14,8 @@ state = NORMAL_STATE
 def normal_handle(line):
     global state
 
-    print line
+    if len(line) == 0: return
+    # print line
 
     res = exec_prog.search(line)
     if res != None:
@@ -24,9 +25,10 @@ def normal_handle(line):
 def exec_handle(line):
     global state
 
+    if len(line) == 0: return
     res = code_prog.search(line)
     if res != None:
-	print line
+	# print line
 	subprocess.call(line, shell=True)
     else:
 	state = NORMAL_STATE
@@ -50,6 +52,6 @@ def mdexec(args):
     try:
 	f = open(filename)
 	for line in f:
-	    handlers[state](line)
+	    handlers[state](line[:-1])
     except IOError:
 	print "Can't access file: %s." % (filename)
