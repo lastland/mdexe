@@ -1,22 +1,30 @@
 import re
 import subprocess
 
-# TODO: Append to, Replace in.
+# TODO: Replace in.
 
 exec_prog = re.compile("Exec:", re.UNICODE)
 append_prog = re.compile("(?<=Append_to\s\').+(?=\'\s:)", re.UNICODE)
+replace_prog = re.compile("(?<=Replace_in\s\').+(?=\'\s:)", re.UNICODE)
+replace_text_prog = re.compile("to\s:", re.UNICODE)
 code_prog = re.compile("(?<=    )\w+", re.UNICODE)
 
 NORMAL_STATE = 0
 EXEC_STATE = 1
 APPEND_STATE = 2
+REPLACE_PATTERN_STATE = 3
+REPLACE_STATE = 4
 
 state = NORMAL_STATE
 file_object = None
 file_name = None
+replace_pattern = None
+replace_pattern_prog = None
+replace_text = None
+text = None
 
 def normal_handle(line):
-    global state, file_object, file_name
+    global state, file_object, file_name, replace_pattern, replace_text
 
     if len(line) == 0: return
     # print line
@@ -37,6 +45,15 @@ def normal_handle(line):
 	    file_object.write("")
 	except IOError:
 	    print "Can not access file %s" % (file_name)
+	return
+
+    # Replace found
+    res = replace_prog.search(line)
+    if res != None:
+	state = REPLACE_PATTERN_STATE
+	file_name = res.group(0)
+	replace_pattern = []
+	replace_text = []
 	return
 
 
@@ -70,10 +87,48 @@ def append_handle(line):
 	state = NORMAL_STATE
 	handlers[state](line)
 
+def replace_handle(line):
+    global state, file_name, replace_pattern, replace_pattern_prog, replace_text
+
+    if len(line) == 0: return
+
+    if state == REPLACE_PATTERN_STATE:
+	res = replace_text_prog.search(line)
+	if res != None:
+	    state = REPLACE_STATE
+	    pattern = '\n'.join(replace_pattern)
+	    replace_pattern_prog = re.compile(pattern, re.UNICODE)
+	    return
+
+	res = code_prog.search(line)
+	if res != None:
+	    line = line[4:]
+	    replace_pattern.append(line)
+	else:
+	    # Not supposed to happen
+	    pass
+    else:
+	res = code_prog.search(line)
+	if res != None:
+	    line = line[4:]
+	    replace_text.append(line)
+	else:
+	    file_object = open(file_name, "r")
+	    text = ''.join(line for line in file_object)
+	    file_object.close()
+	    text = replace_pattern_prog.sub(''.join(replace_text), text)
+	    file_object = open(file_name, "w")
+	    file_object.write(text)
+	    file_object.close()
+	    state = NORMAL_STATE
+	    handlers[state](line)
+
 
 handlers = {NORMAL_STATE : normal_handle,
 	    EXEC_STATE : exec_handle,
-	    APPEND_STATE : append_handle}
+	    APPEND_STATE : append_handle,
+	    REPLACE_PATTERN_STATE : replace_handle,
+	    REPLACE_STATE : replace_handle}
 
 
 def mdexec(args):
