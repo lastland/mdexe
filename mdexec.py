@@ -67,6 +67,8 @@ def append_handle(line):
 	    print "Error happened while trying to append text into file: %s" % (file_name)
     else:
         file_object.close()
+	state = NORMAL_STATE
+	handlers[state](line)
 
 
 handlers = {NORMAL_STATE : normal_handle,
