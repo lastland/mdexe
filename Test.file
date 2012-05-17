@@ -1,1 +1,2 @@
-This line should remain if the test succeeded.
+This line should remain if the append test succeeded.
+This line should be replaced if the replace test succeeded.
