@@ -62,7 +62,7 @@ def append_handle(line):
 	line = line[4:]
 	# print line
 	try:
-	    file_object.write(line)
+	    file_object.write(line + '\n')
 	except IOError:
 	    print "Error happened while trying to append text into file: %s" % (file_name)
     else:
