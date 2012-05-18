@@ -6,7 +6,7 @@ append_prog = re.compile("(?<=Append_to\s\').+(?=\'\s:)", re.UNICODE)
 replace_prog = re.compile("(?<=Replace_in\s\').+(?=\'\s:)", re.UNICODE)
 replace_text_prog = re.compile("to\s:", re.UNICODE)
 replace_and_prog = re.compile("and\s:", re.UNICODE)
-code_prog = re.compile("(?<=    )\w+", re.UNICODE)
+code_prog = re.compile("(?<=    ).+", re.UNICODE)
 
 NORMAL_STATE = 0
 EXEC_STATE = 1
