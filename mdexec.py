@@ -1,12 +1,11 @@
 import re
 import subprocess
 
-# TODO: Replace in.
-
 exec_prog = re.compile("Exec:", re.UNICODE)
 append_prog = re.compile("(?<=Append_to\s\').+(?=\'\s:)", re.UNICODE)
 replace_prog = re.compile("(?<=Replace_in\s\').+(?=\'\s:)", re.UNICODE)
 replace_text_prog = re.compile("to\s:", re.UNICODE)
+replace_and_prog = re.compile("and\s:", re.UNICODE)
 code_prog = re.compile("(?<=    )\w+", re.UNICODE)
 
 NORMAL_STATE = 0
@@ -120,8 +119,14 @@ def replace_handle(line):
 	    file_object = open(file_name, "w")
 	    file_object.write(text)
 	    file_object.close()
-	    state = NORMAL_STATE
-	    handlers[state](line)
+	    res = replace_and_prog.search(line)
+	    if res != None:
+		state = REPLACE_PATTERN_STATE
+		replace_pattern = []
+		replace_text = []
+	    else:
+		state = NORMAL_STATE
+		handlers[state](line)
 
 
 handlers = {NORMAL_STATE : normal_handle,

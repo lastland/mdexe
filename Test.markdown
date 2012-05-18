@@ -18,4 +18,12 @@ to :
 
     has been replaced
 
+and :
+
+    /\*.*\*/
+
+to :
+
+    The comment has been replaced.
+
 End.
