@@ -1,0 +1,4 @@
+This line should remain if the append test succeeded.
+This line has been replaced.
+The comment has been replaced.
+append test succeed!
